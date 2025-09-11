@@ -1,21 +1,3 @@
-terraform {
-  required_version = ">= 1.6"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 5.0"
-    }
-    tls = {
-      source  = "hashicorp/tls"
-      version = ">= 4.0"
-    }
-    local = {
-      source  = "hashicorp/local"
-      version = ">= 2.0"
-    }
-  }
-}
-
 # --- Security Group principal ---
 resource "aws_security_group" "main" {
   name        = "${var.name_vpc}_main_sg"
@@ -58,7 +40,7 @@ resource "aws_security_group" "main" {
 
 # --- VPC con 2 públicas + 2 privadas + NATs + endpoints ---
 module "vpc" {
-  source          = "../../../modules/aws/vpc"
+  source          = "../../../../modules/aws/vpc"
   name_vpc        = var.name_vpc
   cidr_block      = var.cidr_block
   public_subnets  = var.public_subnets
@@ -70,7 +52,7 @@ module "vpc" {
 
 # --- KMS para cifrado de secretos ---
 module "kms" {
-  source              = "../../../modules/aws/kms"
+  source              = "../../../../modules/aws/kms"
   name                = "ansible-core"
   description         = "KMS para Ansible Core"
   enable_key_rotation = true
@@ -79,13 +61,13 @@ module "kms" {
 
 # --- IAM para EKS ---
 module "eks_iam" {
-  source       = "../../../modules/aws/iam/iam_eks"
+  source       = "../../../../modules/aws/iam/iam_eks"
   cluster_name = var.eks_name
 }
 
 # --- IAM para Ansible Core ---
 module "iam_ansible_core" {
-  source                = "../../../modules/aws/iam/iam_ansible_core"
+  source                = "../../../../modules/aws/iam/iam_ansible_core"
   role_name             = var.iam_control_role_name
   instance_profile_name = var.iam_control_instance_profile_name
   kms_key_arn           = module.kms.kms_key_arn
@@ -99,7 +81,7 @@ resource "aws_kms_ciphertext" "ansible_secret" {
 
 # --- EKS (control plane gestionado, nodos en privadas) ---
 module "eks" {
-  source           = "../../../modules/aws/eks"
+  source           = "../../../../modules/aws/eks"
   name             = var.eks_name
   cluster_role_arn = module.eks_iam.eks_cluster_role_arn
   node_role_arn    = module.eks_iam.eks_node_role_arn
@@ -113,7 +95,7 @@ module "eks" {
 
 # --- EC2 Ansible Core en subnet privada ---
 module "ec2_ansible_core" {
-  source               = "../../../modules/aws/ec2/ec2_ansible_core"
+  source               = "../../../../modules/aws/ec2/ec2_ansible_core"
   ami                  = data.aws_ami.amazon_linux.id
   instance_type        = var.instance_type
   subnet_id            = module.vpc.private_subnet_ids[0]
@@ -129,7 +111,7 @@ module "ec2_ansible_core" {
 
 # --- ALB (en subnets públicas) ---
 module "alb" {
-  source            = "../../../modules/aws/alb"
+  source            = "../../../../modules/aws/alb"
   name_alb          = var.name_alb
   vpc_id            = module.vpc.vpc_id
   public_subnets    = module.vpc.public_subnet_ids
@@ -174,4 +156,3 @@ resource "local_file" "ansible_core_key" {
   content  = tls_private_key.ansible_core.private_key_pem
   filename = "${path.module}/ansible-core-key.pem"
 }
-

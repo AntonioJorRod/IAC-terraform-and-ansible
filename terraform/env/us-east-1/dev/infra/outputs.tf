@@ -9,6 +9,26 @@ output "eks_cluster_ca" {
   value       = module.eks.cluster_certificate_authority
 }
 
+output "cluster_name" {
+  description = "Nombre del cluster EKS"
+  value       = module.eks.cluster_name
+}
+
+output "cluster_endpoint" {
+  description = "Endpoint del cluster EKS"
+  value       = module.eks.cluster_endpoint
+}
+
+output "cluster_certificate" {
+  description = "Autoridad de certificados del cluster EKS"
+  value       = module.eks.cluster_certificate_authority
+}
+
+output "aws_auth_ready" {
+  description = "Recurso nulo que indica que el aws-auth ConfigMap está aplicado"
+  value       = module.eks.aws_auth_ready
+}
+
 # --- ALB ---
 output "alb_dns_name" {
   description = "DNS del Application Load Balancer"
