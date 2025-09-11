@@ -29,8 +29,9 @@ resource "aws_eks_cluster" "cluster" {
 
   vpc_config {
     subnet_ids              = var.private_subnets
-    endpoint_public_access  = false
+    endpoint_public_access  = true
     endpoint_private_access = true
+    public_access_cidrs     = ["46.6.57.115/32"]
   }
 
   encryption_config {
@@ -42,7 +43,6 @@ resource "aws_eks_cluster" "cluster" {
 
   lifecycle {
     prevent_destroy = false
-    ignore_changes  = [vpc_config]
   }
 }
 
@@ -64,7 +64,8 @@ resource "aws_eks_node_group" "nodes" {
   }
 
   depends_on = [
-    aws_eks_cluster.cluster
+    aws_eks_cluster.cluster,
+    null_resource.apply_aws_auth
   ]
 
   lifecycle {
@@ -72,4 +73,34 @@ resource "aws_eks_node_group" "nodes" {
   }
 
   tags = var.tags_eks
+}
+
+# aws-auth (sin ciclo con provider kubernetes)
+resource "null_resource" "apply_aws_auth" {
+  depends_on = [aws_eks_cluster.cluster]
+
+  provisioner "local-exec" {
+    interpreter = ["PowerShell", "-Command"]
+    command = <<EOT
+aws eks update-kubeconfig --name ${var.name} --region us-east-1
+@"
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: ${var.node_role_arn}
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+    - rolearn: ${var.cluster_role_arn}
+      username: terraform
+      groups:
+        - system:masters
+"@ | kubectl apply -f -
+EOT
+  }
 }
