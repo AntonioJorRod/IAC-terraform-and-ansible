@@ -1,8 +1,11 @@
+
 provider "aws" {
   region = "us-east-1"
   alias  = "us-east-1"
 }
 
+# Debemos leer aqui con Data tfstate en los otros es meramente data por que el modulo eks vive en infra
+# aqui eks viva en tfstate por lo que es data.tfstate
 data "terraform_remote_state" "infra" {
   backend = "s3"
   config = {
@@ -12,18 +15,22 @@ data "terraform_remote_state" "infra" {
   }
 }
 
+data "aws_eks_cluster_auth" "this" {
+  name = data.terraform_remote_state.infra.outputs.cluster_name
+}
+
 provider "kubernetes" {
   alias                  = "eks"
-  host                   = data.aws_eks_cluster.this.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
+  host                   = data.terraform_remote_state.infra.outputs.cluster_endpoint
+  cluster_ca_certificate = base64decode(data.terraform_remote_state.infra.outputs.cluster_certificate)
   token                  = data.aws_eks_cluster_auth.this.token
 }
 
 provider "helm" {
   alias = "eks"
   kubernetes {
-    host                   = data.aws_eks_cluster.this.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
+    host                   = data.terraform_remote_state.infra.outputs.cluster_endpoint
+    cluster_ca_certificate = base64decode(data.terraform_remote_state.infra.outputs.cluster_certificate)
     token                  = data.aws_eks_cluster_auth.this.token
   }
 }
