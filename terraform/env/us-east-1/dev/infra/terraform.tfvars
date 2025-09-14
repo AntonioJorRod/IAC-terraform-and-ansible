@@ -13,14 +13,14 @@ tags = {
 
 # --- EKS ---
 eks_name          = "dev-eks"
-eks_instance_type = "t3.micro"
+eks_instance_type = "t3.medium"
 eks_desired       = 2
 eks_min           = 1
-eks_max           = 2
+eks_max           = 3
 
 # --- EC2 Ansible Core ---
 instance_type = "t3.micro"
-key_name      = "mi-keypair" # Debe existir en AWS
+key_name      = "mi-keypair"
 
 tags_ansible_core = {
   Name    = "ansible-core"

@@ -156,3 +156,12 @@ resource "local_file" "ansible_core_key" {
   content  = tls_private_key.ansible_core.private_key_pem
   filename = "${path.module}/ansible-core-key.pem"
 }
+
+# Implementation of ebs-csi-driver
+module "ebs_csi_driver" {
+  source = "../../../../modules/aws/eks-addons/ebs-csi-driver"
+
+  cluster_name       = module.eks.cluster_name
+  oidc_provider_arn  = module.eks.oidc_provider_arn
+  oidc_provider_url  = module.eks.oidc_provider_url
+}

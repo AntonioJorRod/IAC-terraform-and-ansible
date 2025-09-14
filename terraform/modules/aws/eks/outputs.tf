@@ -21,3 +21,14 @@ output "cluster_name" {
 output "aws_auth_ready" {
   value = null_resource.apply_aws_auth
 }
+
+# ebs-csi outputs
+output "oidc_provider_url" {
+  description = "OIDC issuer URL real del cluster EKS"
+  value       = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+}
+
+output "oidc_provider_arn" {
+  description = "ARN del OIDC provider creado en IAM"
+  value       = aws_iam_openid_connect_provider.eks.arn
+}
