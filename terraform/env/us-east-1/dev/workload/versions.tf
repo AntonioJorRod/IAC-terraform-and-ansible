@@ -14,12 +14,14 @@ terraform {
       version = ">= 2.0"
     }
     kubernetes = {
-      source  = "hashicorp/kubernetes"
+      source = "hashicorp/kubernetes"
       version = ">= 2.11.0"
+      configuration_aliases = [kubernetes.eks]
     }
     helm = {
-      source  = "hashicorp/helm"
+      source = "hashicorp/helm"
       version = "2.12.1"
+      configuration_aliases = [helm.eks]
     }
   }
 }

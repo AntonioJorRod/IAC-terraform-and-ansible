@@ -157,11 +157,19 @@ resource "local_file" "ansible_core_key" {
   filename = "${path.module}/ansible-core-key.pem"
 }
 
-# Implementation of ebs-csi-driver
-module "ebs_csi_driver" {
-  source = "../../../../modules/aws/eks-addons/ebs-csi-driver"
+# ODIC implementation
+module "eks_oidc" {
+  source   = "../../../../modules/aws/eks-odic"
+  oidc_url = module.eks.cluster_identity_oidc
+}
 
-  cluster_name       = module.eks.cluster_name
-  oidc_provider_arn  = module.eks.oidc_provider_arn
-  oidc_provider_url  = module.eks.oidc_provider_url
+# Jenkins
+# IAM role for Jenkins ServiceAccount (IRSA)
+module "iam_jenkins" {
+  source             = "../../../../modules/aws/iam/iam_jenkins"
+  oidc_provider_arn  = module.eks_oidc.arn
+  oidc_provider_url  = module.eks.cluster_identity_oidc
+  namespace          = "jenkins"
+  serviceaccount     = "jenkins-sa"
+  policy_arn         = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }

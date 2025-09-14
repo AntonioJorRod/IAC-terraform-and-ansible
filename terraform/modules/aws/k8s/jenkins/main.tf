@@ -1,26 +1,21 @@
-provider "kubernetes" {
-  alias                  = "eks"
-  host                   = var.cluster_endpoint
-  cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
-  token                  = data.aws_eks_cluster_auth.this.token
-}
-
-provider "helm" {
-  alias = "eks"
-  kubernetes {
-    host                   = var.cluster_endpoint
-    cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
-    token                  = data.aws_eks_cluster_auth.this.token
+terraform {
+  required_providers {
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+      configuration_aliases = [kubernetes.eks]
+    }
+    helm = {
+      source = "hashicorp/helm"
+      configuration_aliases = [helm.eks]
+    }
   }
-}
-
-data "aws_eks_cluster_auth" "this" {
-  name = var.cluster_name
 }
 
 resource "kubernetes_namespace" "this" {
   provider = kubernetes.eks
-  metadata { name = var.namespace }
+  metadata {
+    name = var.namespace
+  }
   depends_on = [var.aws_auth_ready]
 }
 

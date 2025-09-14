@@ -1,4 +1,3 @@
-
 provider "aws" {
   region = "us-east-1"
   alias  = "us-east-1"
@@ -7,7 +6,7 @@ provider "aws" {
 # Debemos leer aqui con Data tfstate en los otros es meramente data por que el modulo eks vive en infra
 # aqui eks viva en tfstate por lo que es data.tfstate
 data "terraform_remote_state" "infra" {
-  backend = "s3"
+  backend = "s3"  
   config = {
     bucket = "toni-bootstrap-tfstate-us-east-1"
     key    = "dev/infra/terraform.tfstate"
