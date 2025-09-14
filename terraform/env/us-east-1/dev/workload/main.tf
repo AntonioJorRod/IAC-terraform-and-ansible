@@ -1,4 +1,13 @@
 # Jenkins config
+# Implementation of ebs-csi-driver - Non used, we use helm cause this plugins enable 2 replicas and we want only 1
+# module "ebs_csi_driver" {
+#   source = "../../../../modules/aws/eks-addons/ebs-csi-driver"
+#
+#   cluster_name       = module.eks.cluster_name
+#   oidc_provider_arn  = module.eks_oidc.arn
+#   oidc_provider_url  = module.eks.cluster_identity_oidc
+# }
+
 module "storageclass" {
   source = "../../../../modules/aws/k8s/storageclass"
 
@@ -6,7 +15,8 @@ module "storageclass" {
   volume_type = "gp3"
 
   providers = {
-    kubernetes = kubernetes.eks
+    kubernetes.eks = kubernetes.eks
+    helm.eks       = helm.eks
   }
 }
 
@@ -22,7 +32,7 @@ module "jenkins" {
   aws_auth_ready         = data.terraform_remote_state.infra.outputs.aws_auth_ready
 
   providers = {
-    kubernetes = kubernetes.eks
-    helm       = helm.eks
+    kubernetes.eks = kubernetes.eks
+    helm.eks       = helm.eks
   }
 }

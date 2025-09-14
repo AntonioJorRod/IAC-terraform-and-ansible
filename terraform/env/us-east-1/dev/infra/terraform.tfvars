@@ -13,10 +13,10 @@ tags = {
 
 # --- EKS ---
 eks_name          = "dev-eks"
-eks_instance_type = "t3.medium"
-eks_desired       = 2
-eks_min           = 1
-eks_max           = 3
+eks_instance_type = "t3.micro"
+eks_desired       = 3
+eks_min           = 2
+eks_max           = 5
 
 # --- EC2 Ansible Core ---
 instance_type = "t3.micro"
