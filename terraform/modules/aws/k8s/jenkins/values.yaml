@@ -2,40 +2,37 @@ controller:
   admin:
     username: admin
     password: admin123
+
   serviceType: LoadBalancer
 
   installPlugins:
-    - kubernetes:latest
-    - workflow-aggregator:latest
-    - git:latest
-    - configuration-as-code:latest
+    - kubernetes:4203.v1dd44f5b_1cf9
+    - workflow-aggregator:590.v6a_d052e5a_a_b_5
+    - git:5.2.1
+    - github:1.37.3
+    - github-branch-source:1814.v404a_231562b_f
+    - credentials-binding:642.v737c34dea_6c2
+    - aws-credentials:213.vdf9ef9f599f3
+    - pipeline-aws:1.43
+    - ansicolor:1.0.4
+    - junit:1265.v65b_14fa_f12f0
+    - slack:687.v833b_e157ee8e
+    - blueocean:1.27.6
+    - configuration-as-code:1775.v810dc950b_514
+    - config-file-provider:968.ve1ca_eb_9e4913
+    - jacoco:3.3.2
+
+  envFromSecret: jenkins-secrets # Aquí Jenkins leerá el Secret creado en secrets.tf
 
   JCasC:
     enabled: true
-    defaultConfig: true
-    configScripts:
-      kubernetes: |
-        jenkins:
-          clouds:
-          - kubernetes:
-              name: "kubernetes"
-              serverUrl: "https://kubernetes.default"
-              namespace: "jenkins"
-              jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
-              containerCapStr: "2"
-              templates:
-              - name: "default-agent"
-                label: "k8s-agent"
-                containers:
-                - name: "jnlp"
-                  image: "jenkins/inbound-agent:latest"
-                  ttyEnabled: true
-                  command: ""
+    configMap: jenkins-jcasc # Aquí Jenkins leerá el ConfigMap creado en secrets.tf con jenkins.yaml
 
 persistence:
   enabled: true
   storageClass: gp3
-  size: 20Gi
+  accessMode: ReadWriteOnce
+  size: 50Gi
 
 rbac:
   create: true
