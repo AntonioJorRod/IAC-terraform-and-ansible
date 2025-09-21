@@ -9,7 +9,7 @@
 # }
 
 module "storageclass" {
-  source = "../../../../modules/aws/k8s/storageclass"
+  source = "../../../../modules/aws/k8s/ebs-csi-driver"
 
   name        = "gp3"
   volume_type = "gp3"
