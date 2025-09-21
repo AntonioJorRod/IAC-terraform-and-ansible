@@ -22,9 +22,10 @@ module "storageclass" {
 
 module "jenkins" {
   source        = "../../../../modules/aws/k8s/jenkins"
-  namespace     = "jenkins"
-  release_name  = "jenkins"
-  chart_version = "4.7.0"
+  namespace     = var.namespace
+  release_name  = var.release_name
+  chart_version = var.chart_version
+  region        = var.region
 
   cluster_endpoint       = data.terraform_remote_state.infra.outputs.cluster_endpoint
   cluster_ca_certificate = data.terraform_remote_state.infra.outputs.cluster_certificate
@@ -35,4 +36,9 @@ module "jenkins" {
     kubernetes.eks = kubernetes.eks
     helm.eks       = helm.eks
   }
+}
+
+module "secrets_operators" {
+  source = "../../../modules/k8s/operators/secrets-operators"
+  region = var.region
 }

@@ -22,11 +22,13 @@ controller:
     - config-file-provider:968.ve1ca_eb_9e4913
     - jacoco:3.3.2
 
-  envFromSecret: jenkins-secrets # Aquí Jenkins leerá el Secret creado en secrets.tf
+  envFrom:
+    - secretRef:
+        name: jenkins-secrets
 
   JCasC:
     enabled: true
-    configMap: jenkins-jcasc # Aquí Jenkins leerá el ConfigMap creado en secrets.tf con jenkins.yaml
+    configMap: jenkins-jcasc
 
 persistence:
   enabled: true
