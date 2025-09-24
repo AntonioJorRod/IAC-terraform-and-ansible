@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-app-prod
+  namespace: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: react-app
+      track: stable
+  template:
+    metadata:
+      labels:
+        app: react-app
+        track: stable
+    spec:
+      containers:
+      - name: react-app
+        image: docker.io/miusuario/cicdcompletelab-react:stable
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "1"
+            memory: "512Mi"
