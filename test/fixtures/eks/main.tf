@@ -9,7 +9,7 @@ module "eks" {
   cluster_role_arn  = "arn:aws:iam::123456789012:role/mock-eks-cluster-role"
   node_role_arn     = "arn:aws:iam::123456789012:role/mock-eks-node-role"
   private_subnets   = ["subnet-aaaa1111", "subnet-bbbb2222"]
-  instance_type     = "t3.micro"
+  instance_type     = "t4g.micro"
   desired           = 1
   max               = 2
   min               = 1
