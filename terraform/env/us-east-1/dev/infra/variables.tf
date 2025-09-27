@@ -104,6 +104,10 @@ variable "name_alb" {
 
 # --- Seguridad ---
 variable "my_ip" {
-  description = "Dirección IP desde la que se permite SSH (formato CIDR, ej. 1.2.3.4/32)"
+  type        = string
+}
+
+# --- Route53 ---
+variable "domain_name" {
   type        = string
 }

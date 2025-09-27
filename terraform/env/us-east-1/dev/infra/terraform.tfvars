@@ -40,3 +40,6 @@ name_alb = "dev-alb"
 
 # --- Seguridad ---
 my_ip = "80.24.35.17/32"
+
+# --- Route53 ---
+domain_name = "idontgonnapayadomain.com"

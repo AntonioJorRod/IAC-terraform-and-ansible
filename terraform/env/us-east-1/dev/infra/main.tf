@@ -173,3 +173,13 @@ module "iam_jenkins" {
   serviceaccount     = "jenkins-sa"
   policy_arn         = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
+
+# Route 53
+module "route53" {
+  source            = "../../../../modules/aws/route53"
+  domain_name       = var.domain_name
+  alb_dns_name      = module.alb.dns_name
+  alb_zone_id       = module.alb.zone_id
+  jenkins_dns_name  = module.jenkins.jenkins_dns_name
+  tags              = var.tags
+}
