@@ -10,7 +10,7 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
 spec:
   rules:
-    - host: ${var.jenkins_dns_name}
+    - host: jenkins.${var.domain_name}
       http:
         paths:
           - path: /

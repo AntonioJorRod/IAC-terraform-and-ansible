@@ -118,7 +118,7 @@ module "alb" {
   security_group_id = aws_security_group.main.id
 }
 
-# --- Imagen Amazon Linux 2 ---
+# --- Imagen Amazon Linux 2 para ansible core---
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
@@ -176,10 +176,9 @@ module "iam_jenkins" {
 
 # Route 53
 module "route53" {
-  source            = "../../../../modules/aws/route53"
-  domain_name       = var.domain_name
-  alb_dns_name      = module.alb.dns_name
-  alb_zone_id       = module.alb.zone_id
-  jenkins_dns_name  = module.jenkins.jenkins_dns_name
-  tags              = var.tags
+  source       = "../../../../modules/aws/route53"
+  domain_name  = var.domain_name
+  alb_dns_name = module.alb.dns_name
+  alb_zone_id  = module.alb.zone_id
+  tags         = var.tags
 }

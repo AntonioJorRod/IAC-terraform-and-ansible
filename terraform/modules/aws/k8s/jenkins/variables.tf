@@ -6,4 +6,3 @@ variable "cluster_ca_certificate" { type = string }
 variable "cluster_name"           { type = string }
 variable "aws_auth_ready"         { type = any    }
 variable "region"                 { type = string }
-variable "jenkins_dns_name"       { type = string }

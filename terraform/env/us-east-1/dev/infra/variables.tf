@@ -111,3 +111,7 @@ variable "my_ip" {
 variable "domain_name" {
   type        = string
 }
+
+variable "domain_name" {
+  type        = string
+}
