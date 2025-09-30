@@ -182,3 +182,69 @@ module "route53" {
   alb_zone_id  = module.alb.zone_id
   tags         = var.tags
 }
+
+# --- IAM para Transfer Family ---
+module "transfer_family_iam" {
+  source = "../../../../modules/aws/iam/iam_transfer_family"
+
+  name_prefix = "transfer-user"
+  users = {
+    "sftpuser1" = {
+      s3_bucket_access     = true
+      s3_bucket_name       = "my-sftp-bucket-1"
+      efs_access          = false
+      efs_file_system_arn = ""
+      enable_logging      = true
+      custom_policy       = ""
+    }
+    "sftpuser2" = {
+      s3_bucket_access     = true
+      s3_bucket_name       = "my-sftp-bucket-2"
+      efs_access          = false
+      efs_file_system_arn = ""
+      enable_logging      = true
+      custom_policy       = ""
+    }
+  }
+
+  tags = merge(var.tags, { Env = "dev" })
+}
+
+# --- Transfer Family (SFTP Server) ---
+module "transfer_family" {
+  source = "../../../../modules/aws/transfer-family"
+
+  name                       = "transfer-server"
+  protocols                  = ["SFTP"]
+  identity_provider_type     = "SERVICE_MANAGED"
+  endpoint_type              = "VPC"
+  vpc_id                     = module.vpc.vpc_id
+  subnet_ids                 = module.vpc.private_subnet_ids
+  security_group_ids         = [aws_security_group.main.id]
+  create_security_group      = false
+  allowed_cidr_blocks        = ["10.0.0.0/16"]
+  security_policy_name       = "TransferSecurityPolicy-2020-06"
+  create_log_group           = true
+  log_retention_days         = 30
+
+  users = {
+    "sftpuser1" = {
+      role_arn       = module.transfer_family_iam.user_role_arns["sftpuser1"]
+      home_directory = "/${module.vpc.vpc_id}/sftp-user-1"
+      policy         = ""
+      ssh_keys = {
+        "key1" = "AAAAB3NzaC1yc2EAAAADAQABAAABAQ..." # Reemplazar con clave SSH pública real
+      }
+    }
+    "sftpuser2" = {
+      role_arn       = module.transfer_family_iam.user_role_arns["sftpuser2"]
+      home_directory = "/${module.vpc.vpc_id}/sftp-user-2"
+      policy         = ""
+      ssh_keys = {
+        "key1" = "AAAAB3NzaC1yc2EAAAADAQABAAACAQ..." # Reemplazar con clave SSH pública real
+      }
+    }
+  }
+
+  tags = merge(var.tags, { Env = "dev" })
+}
