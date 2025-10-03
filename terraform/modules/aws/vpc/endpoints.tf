@@ -51,6 +51,8 @@ locals {
     ecr_dkr      = "com.amazonaws.${var.region}.ecr.dkr"
     logs         = "com.amazonaws.${var.region}.logs"
     ec2          = "com.amazonaws.${var.region}.ec2"
+    monitoring   = "com.amazonaws.${var.region}.monitoring"
+    xray         = "com.amazonaws.${var.region}.xray"
   }
 }
 

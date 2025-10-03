@@ -15,5 +15,7 @@ output "vpc_endpoints" {
     ecr_dkr     = aws_vpc_endpoint.iface["ecr_dkr"].id
     logs        = aws_vpc_endpoint.iface["logs"].id
     ec2         = aws_vpc_endpoint.iface["ec2"].id
+    monitoring  = aws_vpc_endpoint.iface["monitoring"].id
+    xray        = aws_vpc_endpoint.iface["xray"].id
   }
 }
