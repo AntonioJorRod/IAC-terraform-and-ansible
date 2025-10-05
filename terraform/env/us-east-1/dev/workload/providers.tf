@@ -9,7 +9,7 @@ data "terraform_remote_state" "infra" {
   backend = "s3"  
   config = {
     bucket = "toni-bootstrap-tfstate-us-east-1"
-    key    = "dev/infra/terraform.tfstate"
+    key    = "us-east-1/dev/infra/terraform.tfstate"
     region = "us-east-1"
   }
 }
