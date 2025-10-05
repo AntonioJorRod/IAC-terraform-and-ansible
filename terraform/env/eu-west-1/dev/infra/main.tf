@@ -1,3 +1,22 @@
+# Sección de Data, agarramos los outputs de las otras vpc, luego para VPC peering HubAndSpoke
+data "terraform_remote_state" "us_infra" {
+  backend = "s3"
+  config = {
+    bucket = "toni-bootstrap-tfstate-us-east-1"
+    key    = "us-east-1/dev/infra/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
+data "terraform_remote_state" "asia_infra" {
+  backend = "s3"
+  config = {
+    bucket = "toni-bootstrap-tfstate-ap-northeast-1"
+    key    = "ap-northeast-1/dev/infra/terraform.tfstate"
+    region = "ap-northeast-1"
+  }
+}
+
 # --- Security Group principal ---
 resource "aws_security_group" "main_west" {
   name        = "eu-west-1_main_sg"
@@ -118,18 +137,63 @@ module "alb_west" {
   security_group_id = aws_security_group.main_west.id
 }
 
-# VPC Peering
-module "vpc_peering_eu_us" {
-  source = "../../../../modules/aws/vpc-peering"
 
-  requester_vpc_id  = module.vpc_west.vpc_id
-  accepter_vpc_id   = data.terraform_remote_state.us_infra.outputs.vpc_id
-  requester_region  = "eu-west-1"
-  accepter_region   = "us-east-1"
-  tags              = merge(var.tags, { Env = "dev" })
+# ****ESCENARIO 1**** - Conexión simple 1-1 vpc
 
-  providers = {
-    aws.requester = aws.eu
-    aws.accepter  = aws.us
-  }
-}
+# VPC Peering -- Comentado por que usamos un transit gateway a lo hub and spoke
+# module "vpc_peering_eu_us" {
+#   source = "../../../../modules/aws/vpc-peering"
+
+#   requester_vpc_id  = module.vpc_west.vpc_id
+#   accepter_vpc_id   = data.terraform_remote_state.us_infra.outputs.vpc_id
+#   requester_region  = "eu-west-1"
+#   accepter_region   = "us-east-1"
+#   tags              = merge(var.tags, { Env = "dev" })
+
+#   providers = {
+#     aws.requester = aws.eu
+#     aws.accepter  = aws.us
+#   }
+# }
+
+
+# ****ESCENARIO 2**** - Patrón Hub&Spoke
+
+# --- Transit Gateway (Hub) ---
+# Crea el hub central en Europa (eu-west-1) que interconecta todas las VPC.
+# resource "aws_ec2_transit_gateway" "hub" {
+#   description                     = "Transit Gateway central (hub europeo)"
+#   default_route_table_association = "enable"
+#   default_route_table_propagation = "enable"
+#   auto_accept_shared_attachments  = "disable"    # Recuerda despues de crearlo aprobarlo a mano en la UI
+
+#   tags = merge(var.tags, { Name = "tgw-hub-eu" })
+# }
+
+# # --- Attach de la VPC europea (spoke principal) ---
+# resource "aws_ec2_transit_gateway_vpc_attachment" "eu" {
+#   transit_gateway_id = aws_ec2_transit_gateway.hub.id
+#   vpc_id             = module.vpc_west.vpc_id
+#   subnet_ids         = module.vpc_west.private_subnet_ids
+
+#   tags = merge(var.tags, { Name = "tgw-attach-eu" })
+# }
+
+# # --- Attach de la VPC americana ---
+# resource "aws_ec2_transit_gateway_vpc_attachment" "us" {
+#   transit_gateway_id = aws_ec2_transit_gateway.hub.id
+#   vpc_id             = data.terraform_remote_state.us_infra.outputs.vpc_id
+#   subnet_ids         = data.terraform_remote_state.us_infra.outputs.private_subnet_ids
+
+#   tags = merge(var.tags, { Name = "tgw-attach-us" })
+# }
+
+# # --- Attach de la VPC asiática ---
+# resource "aws_ec2_transit_gateway_vpc_attachment" "asia" {
+#   transit_gateway_id = aws_ec2_transit_gateway.hub.id
+#   vpc_id             = data.terraform_remote_state.asia_infra.outputs.vpc_id
+#   subnet_ids         = data.terraform_remote_state.asia_infra.outputs.private_subnet_ids
+
+#   tags = merge(var.tags, { Name = "tgw-attach-asia" })
+# }
+
