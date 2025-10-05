@@ -117,3 +117,19 @@ module "alb_west" {
   public_subnets    = module.vpc_west.public_subnet_ids
   security_group_id = aws_security_group.main_west.id
 }
+
+# VPC Peering
+module "vpc_peering_eu_us" {
+  source = "../../../../modules/aws/vpc-peering"
+
+  requester_vpc_id  = module.vpc_west.vpc_id
+  accepter_vpc_id   = data.terraform_remote_state.us_infra.outputs.vpc_id
+  requester_region  = "eu-west-1"
+  accepter_region   = "us-east-1"
+  tags              = merge(var.tags, { Env = "dev" })
+
+  providers = {
+    aws.requester = aws.eu
+    aws.accepter  = aws.us
+  }
+}
