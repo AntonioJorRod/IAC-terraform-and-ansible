@@ -1,7 +1,7 @@
 # --- Security Group principal ---
 resource "aws_security_group" "main_west" {
-  name        = "us-west-1_main_sg"
-  description = "SG general para ALB, EKS y Ansible Core en us-west-1"
+  name        = "eu-west-1_main_sg"
+  description = "SG general para ALB, EKS y Ansible Core en eu-west-1"
   vpc_id      = module.vpc_west.vpc_id
 
   ingress {
@@ -35,7 +35,7 @@ resource "aws_security_group" "main_west" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(var.tags, { Name = "us-west-1_main_sg" })
+  tags = merge(var.tags, { Name = "eu-west-1_main_sg" })
 }
 
 # --- VPC con 2 públicas + 2 privadas + NATs + endpoints ---
@@ -45,16 +45,16 @@ module "vpc_west" {
   cidr_block      = "10.20.0.0/16"
   public_subnets  = ["10.20.1.0/24","10.20.2.0/24"]
   private_subnets = ["10.20.101.0/24","10.20.102.0/24"]
-  azs             = ["us-west-1a","us-west-1b"]
+  azs             = ["eu-west-1a","eu-west-1b"]
   tags            = var.tags
-  region          = "us-west-1"
+  region          = "eu-west-1"
 }
 
 # --- KMS para cifrado de secretos ---
 module "kms_west" {
   source              = "../../../../modules/aws/kms"
   name                = "ansible-core-west"
-  description         = "KMS para Ansible Core en us-west-1"
+  description         = "KMS para Ansible Core en eu-west-1"
   enable_key_rotation = true
   tags                = var.tags
 }
@@ -103,7 +103,7 @@ module "ec2_ansible_core_west" {
   iam_instance_profile = module.iam_ansible_core_west.instance_profile_name
   key_name             = aws_key_pair.ansible_core.key_name
   tags_ansible_core    = var.tags_ansible_core
-  region               = "us-west-1"
+  region               = "eu-west-1"
   repo_url             = "https://github.com/AntonioJordan/IAC-terraform-and-ansible.git"
   inventory_rel_path   = "ansible/inventories/aws/dev/aws_ec2.yaml"
   ansible_secret_blob  = aws_kms_ciphertext.ansible_secret_west.ciphertext_blob

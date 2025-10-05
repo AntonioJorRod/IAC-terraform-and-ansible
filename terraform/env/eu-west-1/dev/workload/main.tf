@@ -25,7 +25,7 @@ module "jenkins_west" {
   namespace     = var.namespace
   release_name  = var.release_name
   chart_version = var.chart_version
-  region        = "us-west-1"
+  region        = "eu-west-1"
 
   cluster_endpoint       = data.terraform_remote_state.infra_west.outputs.cluster_endpoint_west
   cluster_ca_certificate = data.terraform_remote_state.infra_west.outputs.cluster_certificate_west
@@ -40,5 +40,5 @@ module "jenkins_west" {
 
 module "secrets_operators_west" {
   source = "../../../modules/k8s/operators/secrets-operators"
-  region = "us-west-1"
+  region = "eu-west-1"
 }

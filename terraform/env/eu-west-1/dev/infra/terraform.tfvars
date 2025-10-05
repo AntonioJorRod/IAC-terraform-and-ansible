@@ -1,8 +1,8 @@
 # --- VPC ---
 name_vpc        = "dev-vpc-west"
 cidr_block      = "10.20.0.0/16"
-region          = "us-west-1"
-azs             = ["us-west-1a", "us-west-1b"]
+region          = "eu-west-1"
+azs             = ["eu-west-1a", "eu-west-1b"]
 public_subnets  = ["10.20.1.0/24", "10.20.2.0/24"]
 private_subnets = ["10.20.101.0/24", "10.20.102.0/24"]
 
