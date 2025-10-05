@@ -50,3 +50,24 @@ output "ansible_core_private_ip_west" {
   description = "IP privada de Ansible Core en eu-west-1"
   value       = module.ec2_ansible_core_west.ansible_core_private_ip
 }
+
+# --- Para TGW ---
+output "vpc_id" {
+  description = "ID de la VPC de eu-west-1"
+  value       = module.vpc_west.vpc_id
+}
+
+output "private_subnet_ids" {
+  description = "Subnets privadas en eu-west-1"
+  value       = module.vpc_west.private_subnet_ids
+}
+
+output "public_subnet_ids" {
+  description = "Subnets públicas en eu-west-1"
+  value       = module.vpc_west.public_subnet_ids
+}
+
+output "region" {
+  description = "Región de la VPC"
+  value       = "eu-west-1"
+}

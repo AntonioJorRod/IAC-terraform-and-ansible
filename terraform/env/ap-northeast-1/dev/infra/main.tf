@@ -2,7 +2,7 @@
 resource "aws_security_group" "main_west" {
   name        = "ap-northeast-1_main_sg"
   description = "SG general para ALB, EKS y Ansible Core en ap-northeast-1"
-  vpc_id      = module.vpc_west.vpc_id
+  vpc_id      = module.vpc_asia.vpc_id
 
   ingress {
     description = "Permitir HTTP"
@@ -39,7 +39,7 @@ resource "aws_security_group" "main_west" {
 }
 
 # --- VPC con 2 públicas + 2 privadas + NATs + endpoints ---
-module "vpc_west" {
+module "vpc_asia" {
   source          = "../../../../modules/aws/vpc"
   name_vpc        = "dev-vpc-west"
   cidr_block      = "10.20.0.0/16"
@@ -85,7 +85,7 @@ module "eks_west" {
   name             = "eks-west"
   cluster_role_arn = module.eks_iam_west.eks_cluster_role_arn
   node_role_arn    = module.eks_iam_west.eks_node_role_arn
-  private_subnets  = module.vpc_west.private_subnet_ids
+  private_subnets  = module.vpc_asia.private_subnet_ids
   instance_type    = var.eks_instance_type
   desired          = var.eks_desired
   min              = var.eks_min
@@ -98,7 +98,7 @@ module "ec2_ansible_core_west" {
   source               = "../../../../modules/aws/ec2/ec2_ansible_core"
   ami                  = data.aws_ami.amazon_linux.id
   instance_type        = var.instance_type
-  subnet_id            = module.vpc_west.private_subnet_ids[0]
+  subnet_id            = module.vpc_asia.private_subnet_ids[0]
   security_group_ids   = [aws_security_group.main_west.id]
   iam_instance_profile = module.iam_ansible_core_west.instance_profile_name
   key_name             = aws_key_pair.ansible_core.key_name
@@ -113,7 +113,7 @@ module "ec2_ansible_core_west" {
 module "alb_west" {
   source            = "../../../../modules/aws/alb"
   name_alb          = "alb-west"
-  vpc_id            = module.vpc_west.vpc_id
-  public_subnets    = module.vpc_west.public_subnet_ids
+  vpc_id            = module.vpc_asia.vpc_id
+  public_subnets    = module.vpc_asia.public_subnet_ids
   security_group_id = aws_security_group.main_west.id
 }
