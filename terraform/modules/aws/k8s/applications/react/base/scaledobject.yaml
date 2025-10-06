@@ -1,0 +1,23 @@
+# No funciona por que aún no hay Prometheus listo
+# Medimos promedio de peticiones por segundo en ventanas de 2min, que no superen los 100 peticiones http / seg
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: react-app-prod-scaledobject
+  namespace: frontend
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: react-app-prod
+  minReplicaCount: 2
+  maxReplicaCount: 8
+  cooldownPeriod: 60
+  pollingInterval: 15
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus.monitoring.svc.cluster.local:9090
+        metricName: http_requests_total
+        query: sum(rate(http_requests_total{namespace="frontend"}[2m]))
+        threshold: "100"

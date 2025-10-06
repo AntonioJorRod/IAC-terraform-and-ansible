@@ -197,3 +197,12 @@ module "alb_west" {
 #   tags = merge(var.tags, { Name = "tgw-attach-asia" })
 # }
 
+# KEDA impl
+module "keda" {
+  source             = "../../../../modules/aws/k8s/keda"
+  cluster_name       = module.eks_west.cluster_name
+  namespace          = "keda"
+  keda_chart_version = "2.14.0"
+  keda_log_level     = "info"
+  watch_namespace    = ""
+}
