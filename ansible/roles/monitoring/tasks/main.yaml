@@ -1,0 +1,9 @@
+- name: Log deployment completion
+  copy:
+    dest: /var/log/deploy.log
+    content: "Deployment completed on {{ ansible_date_time.iso8601 }}\n"
+    mode: '0644'
+
+- name: Print monitoring summary
+  debug:
+    msg: "Deployment logged for {{ inventory_hostname }}"

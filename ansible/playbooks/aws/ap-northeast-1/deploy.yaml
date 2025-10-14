@@ -1,0 +1,9 @@
+- name: Deploy configuration to EKS EC2 nodes
+  hosts: values_ec2
+  become: true
+  roles:
+    - role: common
+    - role: prechecks
+    - role: deploy
+    - role: postchecks
+    - role: monitoring

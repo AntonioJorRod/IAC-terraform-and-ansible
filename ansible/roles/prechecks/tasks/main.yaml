@@ -1,0 +1,11 @@
+- name: Verify SSH connectivity
+  ping:
+
+- name: Check available disk space
+  command: df -h /
+  register: disk
+  changed_when: false
+
+- name: Show disk space
+  debug:
+    var: disk.stdout_lines

@@ -1,0 +1,8 @@
+- name: Verify Docker service status
+  command: systemctl is-active docker
+  register: docker_status
+  failed_when: docker_status.stdout != "active"
+
+- name: Display post-deploy confirmation
+  debug:
+    msg: "Postchecks completed successfully on {{ inventory_hostname }}"
