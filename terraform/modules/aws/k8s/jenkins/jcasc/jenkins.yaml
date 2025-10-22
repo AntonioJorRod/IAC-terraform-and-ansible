@@ -1,0 +1,32 @@
+jenkins:
+  systemMessage: "Jenkins en EKS gestionado con JCasC externo"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  clouds:
+    - kubernetes:
+        name: "kubernetes"
+        serverUrl: "https://kubernetes.default"
+        namespace: "jenkins"
+        jenkinsUrl: "http://jenkins.jenkins.svc.cluster.local:8080"
+        containerCapStr: "10"
+        templates:
+          - name: "default-agent"
+            label: "k8s-agent"
+            containers:
+              - name: "jnlp"
+                image: "jenkins/inbound-agent:latest"
+                ttyEnabled: true
+                command: ""
+  unclassified:
+    slackNotifier:
+      teamDomain: "miempresa"
+      tokenCredentialId: "slack-token"
+    location:
+      url: "http://jenkins.mycompany.com/"

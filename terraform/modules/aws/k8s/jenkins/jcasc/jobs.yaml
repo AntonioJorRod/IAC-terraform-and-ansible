@@ -1,0 +1,29 @@
+jobs:
+  - script: >
+      multibranchPipelineJob('cicdcompletelab-react') {
+        branchSources {
+          git {
+            id = "cicd-react"
+            remote('https://github.com/mi-org/cicdcompletelab-react.git')
+            credentialsId('github-creds')
+            traits {
+              headRegexFilter {
+                regex('^(dev|prod)$')
+              }
+            }
+          }
+        }
+        factory {
+          workflowBranchProjectFactory {
+            scriptPath('Jenkinsfile')
+          }
+        }
+        triggers {
+          periodicFolderTrigger {
+            interval("5m")
+          }
+        }
+        properties {
+          disableConcurrentBuilds()
+        }
+      }

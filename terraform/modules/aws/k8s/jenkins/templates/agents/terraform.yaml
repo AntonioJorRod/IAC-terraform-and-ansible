@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  containers:
+    - name: tf
+      image: hashicorp/terraform:1.9
+      command: ["cat"]
+      tty: true

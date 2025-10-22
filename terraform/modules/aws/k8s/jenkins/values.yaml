@@ -28,7 +28,13 @@ controller:
 
   JCasC:
     enabled: true
-    configMap: jenkins-jcasc
+    configScripts:
+      jenkins: |-
+        ${file:/var/jenkins_home/casc_configs/jcasc/jenkins.yaml}
+      credentials: |-
+        ${file:/var/jenkins_home/casc_configs/jcasc/credentials.yaml}
+      jobs: |-
+        ${file:/var/jenkins_home/casc_configs/jcasc/jobs.yaml}
 
 persistence:
   enabled: true
