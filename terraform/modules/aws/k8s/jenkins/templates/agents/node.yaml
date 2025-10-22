@@ -3,7 +3,7 @@ kind: Pod
 spec:
   serviceAccountName: jenkins
   containers:
-    - name: docker
-      image: docker:24-dind
-      securityContext:
-        privileged: true
+    - name: node
+      image: node:${NODE_VERSION:-20}
+      command: ["cat"]
+      tty: true
